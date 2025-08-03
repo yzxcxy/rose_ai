@@ -1,0 +1,70 @@
+syntax = "v2"
+
+info (
+	author: "yzxcxy"
+	desc:   "rose AI agent"
+)
+
+type LoginRequest {
+	username string `json:"username" validate:"required,min=3,max=20"`
+	password string `json:"password" validate:"required,min=6,max=20"`
+}
+
+type LoginResponse {
+	token  string `json:"token"`
+	userId int64  `json:"userId"`
+}
+
+type RegisterRequest {
+	username string `json:"username" validate:"required,min=3,max=20"`
+	password string `json:"password" validate:"required,min=6,max=20"`
+}
+
+type RegisterResponse {
+	userName string `json:"username"`
+	userId   int64  `json:"userId"`
+}
+
+// RAG上传请求
+type RagUploadRequest {
+	fileName string `json:"fileName"`
+	fileData []byte `json:"fileData"`
+}
+
+// RAG上传响应
+type RagUploadResponse {
+	success bool   `json:"success"`
+	message string `json:"message"`
+}
+
+// 问答请求
+type QaRequest {
+	question string `json:"question"`
+	context  string `json:"context"` // 可选，RAG时传入
+}
+
+// 问答响应
+type QaResponse {
+	answer  string `json:"answer"`
+	message string `json:"message"`
+}
+
+service rose-api {
+	@handler loginHandler
+	post /login (LoginRequest) returns (LoginResponse)
+
+	@handler registerHandler
+	post /register (RegisterRequest) returns (RegisterResponse)
+}
+
+@server (
+	jwt: Auth
+)
+service rose-api {
+	@handler ragUploadHandler
+	post /rag/upload (RagUploadRequest) returns (RagUploadResponse)
+
+	@handler qaHandler
+	post /qa (QaRequest) returns (QaResponse)
+}
+

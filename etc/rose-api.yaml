@@ -1,0 +1,19 @@
+Name: rose-api
+Host: 0.0.0.0
+Port: 8888
+ListenOn: 0.0.0.0:8080
+
+Auth:
+  AccessSecret: "rose-ai-agent-secret"
+  AccessExpire: 36000
+
+MySQL:
+  DSN: "root:root@tcp(127.0.0.1:3306)/rose?charset=utf8mb4&parseTime=True"
+
+Redis:
+  RedisHost: "127.0.0.1:6379"
+
+SnowFlake:
+    WorkerID: 1
+    StartTime: "2025-01-01"
+  
