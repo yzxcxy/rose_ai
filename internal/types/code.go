@@ -6,12 +6,18 @@ const (
 	ErrorInvalidParamsCode = iota + 10001
 	ErrorUserNotFound
 	ErrorUserPasswordNotCorrect
+	ErrorNotSupportFileType
+	ErrorNotFile
+	ErrorUploadFailure
 )
 
 var errorMessage = map[int]string{
 	ErrorInvalidParamsCode:      "Invalid parameters",
 	ErrorUserNotFound:           "User not found",
 	ErrorUserPasswordNotCorrect: "User password not correct",
+	ErrorNotSupportFileType:     "Not supported file type",
+	ErrorNotFile:                "Not a file",
+	ErrorUploadFailure:          "File upload failed",
 }
 
 // GetError returns the error message for a given error code.

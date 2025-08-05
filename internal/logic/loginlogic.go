@@ -44,7 +44,7 @@ func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, 
 	secret := l.svcCtx.Config.Auth.AccessSecret
 	expire := l.svcCtx.Config.Auth.AccessExpire
 
-	token, _ := jwt.GetJwtToken(secret, time.Now().Unix(), expire, user.Id, user.Username.String)
+	token, _ := jwt.GetJwtToken(secret, time.Now().Unix(), expire, user.UserID, user.Username.String)
 
 	return &types.LoginResponse{
 		Token:  "Bearer " + token,

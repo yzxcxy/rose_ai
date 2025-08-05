@@ -26,14 +26,10 @@ type RegisterResponse {
 }
 
 // RAG上传请求
-type RagUploadRequest {
-	fileName string `json:"fileName"`
-	fileData []byte `json:"fileData"`
-}
+type RagUploadRequest {}
 
 // RAG上传响应
 type RagUploadResponse {
-	success bool   `json:"success"`
 	message string `json:"message"`
 }
 

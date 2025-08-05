@@ -24,12 +24,9 @@ type QaResponse struct {
 }
 
 type RagUploadRequest struct {
-	FileName string `json:"fileName"`
-	FileData []byte `json:"fileData"`
 }
 
 type RagUploadResponse struct {
-	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
 
