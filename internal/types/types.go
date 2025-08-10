@@ -3,6 +3,45 @@
 
 package types
 
+type CreateTodoReq struct {
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
+	Status      string `json:"status" validate:"omitempty,oneof=pending in_progress completed"`
+	Priority    string `json:"priority" validate:"omitempty,oneof=low medium high"`
+	DueDate     string `json:"dueDate"`
+}
+
+type CreateTodoResp struct {
+	TodoId int64 `json:"todoId"`
+}
+
+type DeleteTodoReq struct {
+	TodoId int64 `path:"todoId"`
+}
+
+type GetTodoReq struct {
+	TodoId int64 `path:"todoId"`
+}
+
+type ListTodoReq struct {
+	Page       int64    `json:"page,default=1"`
+	PageSize   int64    `json:"pageSize,default=10"`
+	Status     []string `josn:"status"`
+	Priority   []string `josn:"priority"`
+	MinDueDate string   `json:"minDueDate"` // 用于筛选最小截止日期
+	MaxDueDate string   `json:"maxDueDate"`
+	Search     string   `json:"search"`    // 用于模糊搜索名称或描述
+	SortBy     []string `json:"sortBy"`    // 用于排序，例如 "createdAt" 或 "dueDate"
+	SortOrder  string   `json:"sortOrder"` // 用于排序顺序，例如 "asc" 或 "desc"
+	StartDate  string   `json:"startDate"` // 用于筛选开始日期
+	EndDate    string   `json:"endDate"`   // 用于筛选结束日期
+}
+
+type ListTodoResp struct {
+	List  []Todo `json:"list"`
+	Total int64  `json:"total"`
+}
+
 type LoginRequest struct {
 	Username string `json:"username" validate:"required,min=3,max=20"`
 	Password string `json:"password" validate:"required,min=6,max=20"`
@@ -38,4 +77,29 @@ type RegisterRequest struct {
 type RegisterResponse struct {
 	UserName string `json:"username"`
 	UserId   int64  `json:"userId"`
+}
+
+type Todo struct {
+	TodoId      int64  `json:"todoId"`
+	UserId      int64  `json:"userId"`
+	UserName    string `json:"userName"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	Priority    string `json:"priority"`
+	DueDate     string `json:"dueDate"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
+}
+
+type UpdateTodoReq struct {
+	TodoId      int64  `path:"todoId"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	Priority    string `json:"priority"`
+	DueDate     string `json:"dueDate"`
+}
+
+type UpdateTodoResp struct {
 }

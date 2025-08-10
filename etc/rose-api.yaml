@@ -16,4 +16,9 @@ Redis:
 SnowFlake:
     WorkerID: 1
     StartTime: "2025-01-01"
+
+DeepSeek:
+  BaseURL: "https://api.deepseek.com/v1"
+  Model: "deepseek-chat"
+  Token: "sk-065e80673c644ff58fc582a9e5f229b4"
   

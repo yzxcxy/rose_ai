@@ -22,4 +22,10 @@ type Config struct {
 		WorkerId  int64  // 雪花算法 Worker ID
 		StartTime string // 雪花算法起始时间
 	}
+
+	DeepSeek struct {
+		BaseURL string // DeepSeek API 基础 URL
+		Token   string // DeepSeek API 访问令牌
+		Model   string // DeepSeek 模型名称
+	}
 }

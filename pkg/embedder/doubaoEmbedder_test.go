@@ -7,7 +7,7 @@ import (
 
 func TestDoubaoEmbedder_EmbedDocuments(t *testing.T) {
 	ctx := context.Background()
-	apiKey := "" // 替换为你的 API Key
+	apiKey := "9f1c2796-55d4-416e-ab08-46c711294934" // 替换为你的 API Key
 	model := "doubao-embedding-large-text-250515"
 
 	embedder := NewDoubaoEmbedder(model, apiKey)

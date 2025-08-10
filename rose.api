@@ -45,6 +45,69 @@ type QaResponse {
 	message string `json:"message"`
 }
 
+type Todo {
+	TodoId      int64  `json:"todoId"`
+	UserId      int64  `json:"userId"`
+	UserName    string `json:"userName"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	Priority    string `json:"priority"`
+	DueDate     string `json:"dueDate"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
+}
+
+type CreateTodoReq {
+	Name        string `json:"name" validate:"required" validate:"min=3,max=100"`
+	Description string `json:"description" validate:"omitempty,max=500"`
+	Status      string `json:"status" validate:"omitempty,oneof=pending in_progress completed"`
+	Priority    string `json:"priority" validate:"omitempty,oneof=low medium high"`
+	DueDate     string `json:"dueDate"`
+}
+
+type CreateTodoResp {
+	TodoId int64 `json:"todoId"`
+}
+
+type GetTodoReq {
+	TodoId int64 `path:"todoId"`
+}
+
+type ListTodoReq {
+	Page       int64    `json:"page,default=1"`
+	PageSize   int64    `json:"pageSize,default=10"`
+	Status     []string `josn:"status"`
+	Priority   []string `josn:"priority"`
+	MinDueDate string   `json:"minDueDate"` // 用于筛选最小截止日期
+	MaxDueDate string   `json:"maxDueDate"`
+	Search     string   `json:"search"` // 用于模糊搜索名称或描述
+	SortBy     []string `json:"sortBy"` // 用于排序，例如 "createdAt" 或 "dueDate"
+	SortOrder  string   `json:"sortOrder"` // 用于排序顺序，例如 "asc" 或 "desc"
+	StartDate  string   `json:"startDate"` // 用于筛选开始日期
+	EndDate    string   `json:"endDate"` // 用于筛选结束日期
+}
+
+type ListTodoResp {
+	List  []Todo `json:"list"`
+	Total int64  `json:"total"`
+}
+
+type UpdateTodoReq {
+	TodoId      int64  `path:"todoId"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	Priority    string `json:"priority"`
+	DueDate     string `json:"dueDate"`
+}
+
+type UpdateTodoResp {}
+
+type DeleteTodoReq {
+	TodoId int64 `path:"todoId"`
+}
+
 service rose-api {
 	@handler loginHandler
 	post /login (LoginRequest) returns (LoginResponse)
@@ -62,5 +125,25 @@ service rose-api {
 
 	@handler qaHandler
 	post /qa (QaRequest) returns (QaResponse)
+
+	// 创建
+	@handler createTodo
+	post /todos (CreateTodoReq) returns (CreateTodoResp)
+
+	// 查询单个
+	@handler getTodo
+	get /todos/:todoId (GetTodoReq) returns (Todo)
+
+	// 分页列表
+	@handler listTodos
+	get /todos (ListTodoReq) returns (ListTodoResp)
+
+	// 更新
+	@handler updateTodo
+	put /todos/:todoId (UpdateTodoReq) returns (UpdateTodoResp)
+
+	// 删除
+	@handler deleteTodo
+	delete /todos/:todoId (DeleteTodoReq)
 }
 

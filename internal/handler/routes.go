@@ -39,6 +39,31 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/rag/upload",
 				Handler: ragUploadHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/todos",
+				Handler: createTodoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/todos",
+				Handler: listTodosHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/todos/:todoId",
+				Handler: getTodoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/todos/:todoId",
+				Handler: updateTodoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/todos/:todoId",
+				Handler: deleteTodoHandler(serverCtx),
+			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)

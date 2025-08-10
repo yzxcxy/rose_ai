@@ -9,6 +9,10 @@ const (
 	ErrorNotSupportFileType
 	ErrorNotFile
 	ErrorUploadFailure
+	ErrorInvalidDueDate
+	ErrorTodoNotFound
+	ErrorInternalServer
+	ErrorInvalidDateFormat
 )
 
 var errorMessage = map[int]string{
@@ -18,6 +22,10 @@ var errorMessage = map[int]string{
 	ErrorNotSupportFileType:     "Not supported file type",
 	ErrorNotFile:                "Not a file",
 	ErrorUploadFailure:          "File upload failed",
+	ErrorInvalidDueDate:         "Invalid due date",
+	ErrorTodoNotFound:           "Todo not found",
+	ErrorInternalServer:         "Internal server error",
+	ErrorInvalidDateFormat:      "Invalid date format, expected '2006-01-02 15:04:05'",
 }
 
 // GetError returns the error message for a given error code.
