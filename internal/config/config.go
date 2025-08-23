@@ -24,8 +24,14 @@ type Config struct {
 	}
 
 	DeepSeek struct {
-		BaseURL string // DeepSeek API 基础 URL
-		Token   string // DeepSeek API 访问令牌
-		Model   string // DeepSeek 模型名称
+		BaseURL   string // DeepSeek API 基础 URL
+		Token     string // DeepSeek API 访问令牌
+		Model     string // DeepSeek 模型名称
+		MaxTokens int    // DeepSeek 最大令牌数
+	}
+
+	Doubao struct {
+		APIKey string // Doubao API Key
+		Model  string // Doubao 模型名称
 	}
 }

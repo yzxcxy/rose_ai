@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	xhttp "github.com/zeromicro/x/http"
 	"net/http"
 
@@ -18,7 +19,8 @@ func qaHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := logic.NewQaLogic(r.Context(), svcCtx)
+		ctx := context.WithValue(r.Context(), "Authorization", r.Header.Get("Authorization"))
+		l := logic.NewQaLogic(ctx, svcCtx)
 		resp, err := l.Qa(&req)
 		if err != nil {
 			xhttp.JsonBaseResponseCtx(r.Context(), w, err)

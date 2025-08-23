@@ -41,8 +41,9 @@ func (l *CreateTodoLogic) CreateTodo(req *types.CreateTodoReq) (resp *types.Crea
 	if req.DueDate == "" {
 		// 设置为今天结束
 		t = time.Now().Truncate(24 * time.Hour).Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+	} else {
+		t, err = time.Parse("2006-01-02 15:04:05", req.DueDate)
 	}
-	t, err = time.Parse("2006-01-02 15:04:05", req.DueDate)
 	if err != nil {
 		logx.Error("Failed to parse due date:", err)
 		err = types.GetError(types.ErrorInvalidDueDate)

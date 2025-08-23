@@ -35,14 +35,25 @@ type RagUploadResponse {
 
 // 问答请求
 type QaRequest {
-	question string `json:"question"`
-	context  string `json:"context"` // 可选，RAG时传入
+	SessionID string `json:"session_id"`
+	Input     string `json:"input"`
+	Memory    Memory `json:"memory"`
+}
+
+type Memory {
+	History []Message `json:"history"`
+}
+
+type Message {
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
 // 问答响应
 type QaResponse {
-	answer  string `json:"answer"`
-	message string `json:"message"`
+	SessionID string `json:"session_id"`
+	Output    string `json:"output"`
+	Memory    Memory `json:"memory"`
 }
 
 type Todo {

@@ -4,8 +4,8 @@
 package types
 
 type CreateTodoReq struct {
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description"`
+	Name        string `json:"name" validate:"required" validate:"min=3,max=100"`
+	Description string `json:"description" validate:"omitempty,max=500"`
 	Status      string `json:"status" validate:"omitempty,oneof=pending in_progress completed"`
 	Priority    string `json:"priority" validate:"omitempty,oneof=low medium high"`
 	DueDate     string `json:"dueDate"`
@@ -52,14 +52,25 @@ type LoginResponse struct {
 	UserId int64  `json:"userId"`
 }
 
+type Memory struct {
+	History []Message `json:"history"`
+}
+
+type Message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
 type QaRequest struct {
-	Question string `json:"question"`
-	Context  string `json:"context"` // 可选，RAG时传入
+	SessionID string `json:"session_id"`
+	Input     string `json:"input"`
+	Memory    Memory `json:"memory"`
 }
 
 type QaResponse struct {
-	Answer  string `json:"answer"`
-	Message string `json:"message"`
+	SessionID string `json:"session_id"`
+	Output    string `json:"output"`
+	Memory    Memory `json:"memory"`
 }
 
 type RagUploadRequest struct {
