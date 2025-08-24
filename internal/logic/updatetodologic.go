@@ -36,12 +36,15 @@ func (l *UpdateTodoLogic) UpdateTodo(req *types.UpdateTodoReq) (resp *types.Upda
 		description = sql.NullString{String: req.Description, Valid: true} // 否则设置为有效
 	}
 
-	dueTime, err := time.Parse("2006-01-02 15:04:05", req.DueDate)
-	if err != nil {
-		return nil, types.GetError(types.ErrorInvalidDateFormat)
+	var dueTime time.Time
+	if req.DueDate != "" {
+		dueTime, err = time.Parse(time.DateTime, req.DueDate)
+		if err != nil {
+			return nil, types.GetError(types.ErrorInvalidDateFormat)
+		}
 	}
 
-	err = todoModel.Update(l.ctx, &model.Todos{
+	err = todoModel.UpdateIgnoreNull(l.ctx, &model.Todos{
 		TodoId:      req.TodoId,
 		Name:        req.Name,
 		Description: description,

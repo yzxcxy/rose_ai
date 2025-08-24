@@ -28,7 +28,7 @@ func (l *DeleteTodoLogic) DeleteTodo(req *types.DeleteTodoReq) error {
 	todosModel := model.NewTodosModel(l.svcCtx.Mysql)
 
 	// 逻辑删除待办事项
-	err := todosModel.Update(l.ctx, &model.Todos{
+	err := todosModel.UpdateIgnoreNull(l.ctx, &model.Todos{
 		TodoId:    req.TodoId,
 		IsDeleted: 1,
 	})

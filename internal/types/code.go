@@ -13,6 +13,7 @@ const (
 	ErrorTodoNotFound
 	ErrorInternalServer
 	ErrorInvalidDateFormat
+	ErrorNoPermission
 )
 
 var errorMessage = map[int]string{
@@ -26,6 +27,7 @@ var errorMessage = map[int]string{
 	ErrorTodoNotFound:           "Todo not found",
 	ErrorInternalServer:         "Internal server error",
 	ErrorInvalidDateFormat:      "Invalid date format, expected '2006-01-02 15:04:05'",
+	ErrorNoPermission:           "No permission to access this resource",
 }
 
 // GetError returns the error message for a given error code.

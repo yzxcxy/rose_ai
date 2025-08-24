@@ -88,15 +88,15 @@ type GetTodoReq {
 type ListTodoReq {
 	Page       int64    `json:"page,default=1"`
 	PageSize   int64    `json:"pageSize,default=10"`
-	Status     []string `josn:"status"`
-	Priority   []string `josn:"priority"`
-	MinDueDate string   `json:"minDueDate"` // 用于筛选最小截止日期
-	MaxDueDate string   `json:"maxDueDate"`
-	Search     string   `json:"search"` // 用于模糊搜索名称或描述
-	SortBy     []string `json:"sortBy"` // 用于排序，例如 "createdAt" 或 "dueDate"
-	SortOrder  string   `json:"sortOrder"` // 用于排序顺序，例如 "asc" 或 "desc"
-	StartDate  string   `json:"startDate"` // 用于筛选开始日期
-	EndDate    string   `json:"endDate"` // 用于筛选结束日期
+	Status     []string `josn:"status,optional"`
+	Priority   []string `josn:"priority,optional"`
+	MinDueDate string   `json:"minDueDate,optional"` // 用于筛选最小截止日期
+	MaxDueDate string   `json:"maxDueDate,optional"`
+	Search     string   `json:"search,optional"` // 用于模糊搜索名称或描述
+	SortBy     []string `json:"sortBy,optional"` // 用于排序，例如 "createdAt" 或 "dueDate"
+	SortOrder  []string `json:"sortOrder,optional"` // 用于排序顺序，例如 "asc" 或 "desc"
+	StartDate  string   `json:"startDate,optional"` // 用于筛选开始日期
+	EndDate    string   `json:"endDate,optional"` // 用于筛选结束日期
 }
 
 type ListTodoResp {
@@ -106,11 +106,11 @@ type ListTodoResp {
 
 type UpdateTodoReq {
 	TodoId      int64  `path:"todoId"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	Priority    string `json:"priority"`
-	DueDate     string `json:"dueDate"`
+	Name        string `json:"name" validate:"omitempty,min=3,max=100"`
+	Description string `json:"description,optional" validate:"omitempty,max=500"`
+	Status      string `json:"status,optional" validate:"omitempty,oneof=pending in_progress completed"`
+	Priority    string `json:"priority,optional" validate:"omitempty,oneof=low medium high"`
+	DueDate     string `json:"dueDate,optional"`
 }
 
 type UpdateTodoResp {}

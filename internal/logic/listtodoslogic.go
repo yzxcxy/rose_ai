@@ -2,8 +2,11 @@ package logic
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"rose/internal/utils"
 	"rose/model"
+	"strings"
 	"time"
 
 	"rose/internal/svc"
@@ -27,6 +30,7 @@ func NewListTodosLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListTod
 }
 
 func (l *ListTodosLogic) ListTodos(req *types.ListTodoReq) (resp *types.ListTodoResp, err error) {
+
 	if req.Page < 1 {
 		req.Page = 1
 	}
@@ -87,44 +91,61 @@ func (l *ListTodosLogic) ListTodos(req *types.ListTodoReq) (resp *types.ListTodo
 		}
 	}
 
+	// 验证排序顺序
+	if req.SortOrder != nil {
+		if len(req.SortOrder) != len(req.SortBy) {
+			return nil, types.GetError(types.ErrorInvalidParamsCode) // 排序字段和排序顺序数量不匹配
+		}
+		validSortFields := map[string]struct{}{
+			"asc":  {},
+			"desc": {},
+		}
+
+		for _, sortOrder := range req.SortOrder {
+			if _, ok := validSortFields[strings.ToLower(sortOrder)]; !ok {
+				return nil, types.GetError(types.ErrorInvalidParamsCode) // 无效的排序顺序
+			}
+		}
+	}
+
 	// 解析日期
 	var startDate, endDate time.Time
 	if req.StartDate != "" {
-		startDate, err = time.Parse("2006-01-02 15:04:05", req.StartDate)
+		startDate, err = time.Parse(time.DateTime, req.StartDate)
 		if err != nil {
 			return nil, types.GetError(types.ErrorInvalidDateFormat)
 		}
 	}
 
 	if req.EndDate != "" {
-		endDate, err = time.Parse("2006-01-02 15:04:05", req.EndDate)
+		endDate, err = time.Parse(time.DateTime, req.EndDate)
 		if err != nil {
 			return nil, types.GetError(types.ErrorInvalidDateFormat)
 		}
 	}
 
 	if endDate.Before(startDate) {
-		return nil, types.GetError(types.ErrorInvalidDateFormat) // 结束日期不能早于开始日期
+		return nil, types.GetError(types.ErrorInvalidDateFormat)
 	}
 
 	// 解析到期日期的范围
 	var minDueDate, maxDueDate time.Time
 	if req.MinDueDate != "" {
-		minDueDate, err = time.Parse("2006-01-02 15:04:05", req.MinDueDate)
+		minDueDate, err = time.Parse(time.DateTime, req.MinDueDate)
 		if err != nil {
 			return nil, types.GetError(types.ErrorInvalidDateFormat)
 		}
 	}
 
 	if req.MaxDueDate != "" {
-		maxDueDate, err = time.Parse("2006-01-02 15:04:05", req.MaxDueDate)
+		maxDueDate, err = time.Parse(time.DateTime, req.MaxDueDate)
 		if err != nil {
 			return nil, types.GetError(types.ErrorInvalidDateFormat)
 		}
 	}
 
 	if maxDueDate.Before(minDueDate) {
-		return nil, types.GetError(types.ErrorInvalidDateFormat) // 最大到期日期不能早于最小到期日期
+		return nil, types.GetError(types.ErrorInvalidDateFormat)
 	}
 
 	uid, _, err := utils.GetUserIdAndUserNameFromContext(l.ctx)
@@ -149,26 +170,25 @@ func (l *ListTodosLogic) ListTodos(req *types.ListTodoReq) (resp *types.ListTodo
 
 	todos, err := todosModel.ListToDos(l.ctx, list)
 	if err != nil {
-		return nil, types.GetError(types.ErrorTodoNotFound)
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, types.GetError(types.ErrorInternalServer)
+		}
 	}
 
 	_, userName, _ := utils.GetUserIdAndUserNameFromContext(l.ctx)
 	var result []types.Todo
 	for _, todo := range todos {
-		description := ""
-		if todo.Description.Valid {
-			description = todo.Description.String
-		}
 		result = append(result, types.Todo{
 			TodoId:      todo.TodoId,
 			UserId:      todo.UserId,
 			UserName:    userName,
-			Description: description,
+			Name:        todo.Name,
+			Description: todo.Description.String,
 			Status:      todo.Status,
 			Priority:    todo.Priority,
-			DueDate:     todo.DueDate.Format("2006-01-02 15:04:05"),
-			CreatedAt:   todo.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:   todo.UpdatedAt.Format("2006-01-02 15:04:05"),
+			DueDate:     todo.DueDate.Format(time.DateTime),
+			CreatedAt:   todo.CreatedAt.Format(time.DateTime),
+			UpdatedAt:   todo.UpdatedAt.Format(time.DateTime),
 		})
 	}
 

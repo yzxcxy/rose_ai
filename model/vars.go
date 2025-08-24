@@ -16,7 +16,7 @@ type ListToDos struct {
 	SortBy   []string // 排序字段
 	Priority []string
 
-	SortOrder  string // 排序方式，asc 或 desc
+	SortOrder  []string // 排序方式，asc 或 desc
 	MinDueDate time.Time
 	MaxDueDate time.Time
 	Search     string // 搜索关键字

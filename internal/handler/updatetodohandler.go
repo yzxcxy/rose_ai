@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	xhttp "github.com/zeromicro/x/http"
 	"net/http"
 
@@ -14,6 +15,7 @@ func updateTodoHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.UpdateTodoReq
 		if err := httpx.Parse(r, &req); err != nil {
+			logx.Infof("%v", err)
 			xhttp.JsonBaseResponseCtx(r.Context(), w, types.GetError(types.ErrorInvalidParamsCode))
 			return
 		}
