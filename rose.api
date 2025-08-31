@@ -119,6 +119,14 @@ type DeleteTodoReq {
 	TodoId int64 `path:"todoId"`
 }
 
+type RagVectorizationRequest {
+	fileName []string `json:"fileName"`
+}
+
+type RagVectorizationResponse {
+	ids []string `json:"ids"`
+}
+
 service rose-api {
 	@handler loginHandler
 	post /login (LoginRequest) returns (LoginResponse)
@@ -133,6 +141,9 @@ service rose-api {
 service rose-api {
 	@handler ragUploadHandler
 	post /rag/upload (RagUploadRequest) returns (RagUploadResponse)
+
+	@handler ragVectorization
+	post /rag/vectorization (RagVectorizationRequest) returns (RagVectorizationResponse)
 
 	@handler qaHandler
 	post /qa (QaRequest) returns (QaResponse)

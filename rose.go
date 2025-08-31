@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
 	"rose/internal/config"
 	"rose/internal/handler"
@@ -36,6 +35,6 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 
-	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	logx.Infof("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()
 }

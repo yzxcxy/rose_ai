@@ -43,6 +43,7 @@ func (l *RagUploadLogic) RagUpload(data *multipart.File, fileName string) (resp 
 		".pdf":  true,
 		".doc":  true,
 		".html": true,
+		".md":   true,
 	}
 
 	ext := strings.ToLower(filepath.Ext(fileName))

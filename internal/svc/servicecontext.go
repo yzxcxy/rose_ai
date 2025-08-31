@@ -9,11 +9,12 @@ import (
 )
 
 type ServiceContext struct {
-	Config config.Config
-	Mysql  sqlx.SqlConn
-	Redis  *redis.Client
-	Cipher cryptUtil.Cipher
-	Agent  *agent.Agent
+	Config            config.Config
+	Mysql             sqlx.SqlConn
+	Redis             *redis.Client
+	Cipher            cryptUtil.Cipher
+	Agent             *agent.Agent
+	StoreFileToVector *agent.StoreFileToVector
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -29,10 +30,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 
 	return &ServiceContext{
-		Config: c,
-		Mysql:  mysql,
-		Redis:  rd,
-		Cipher: cryptUtil.NewBcryptCipher(10),
-		Agent:  a,
+		Config:            c,
+		Mysql:             mysql,
+		Redis:             rd,
+		Cipher:            cryptUtil.NewBcryptCipher(10),
+		Agent:             a,
+		StoreFileToVector: agent.NewStoreFileToVector(&c),
 	}
 }

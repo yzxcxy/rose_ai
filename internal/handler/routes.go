@@ -41,6 +41,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/rag/vectorization",
+				Handler: ragVectorizationHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/todos",
 				Handler: createTodoHandler(serverCtx),
 			},

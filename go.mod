@@ -9,9 +9,12 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/bytedance/sonic v1.13.2
 	github.com/cloudwego/eino v0.4.4
+	github.com/cloudwego/eino-ext/components/document/loader/file v0.0.0-20250822083409-f8d432eea60f
+	github.com/cloudwego/eino-ext/components/document/transformer/splitter/semantic v0.0.0-20250822083409-f8d432eea60f
 	github.com/cloudwego/eino-ext/components/embedding/ark v0.1.0
 	github.com/cloudwego/eino-ext/components/indexer/milvus v0.0.0-20250819065230-0fb5ad04c85f
 	github.com/cloudwego/eino-ext/components/model/deepseek v0.0.0-20250819065230-0fb5ad04c85f
+	github.com/cloudwego/eino-ext/components/retriever/milvus v0.0.0-20250822083409-f8d432eea60f
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.2

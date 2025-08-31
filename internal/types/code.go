@@ -14,6 +14,7 @@ const (
 	ErrorInternalServer
 	ErrorInvalidDateFormat
 	ErrorNoPermission
+	ErrorFileNotExist
 )
 
 var errorMessage = map[int]string{
@@ -28,6 +29,7 @@ var errorMessage = map[int]string{
 	ErrorInternalServer:         "Internal server error",
 	ErrorInvalidDateFormat:      "Invalid date format, expected '2006-01-02 15:04:05'",
 	ErrorNoPermission:           "No permission to access this resource",
+	ErrorFileNotExist:           "file not found",
 }
 
 // GetError returns the error message for a given error code.

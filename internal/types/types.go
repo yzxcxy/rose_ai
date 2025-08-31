@@ -80,6 +80,14 @@ type RagUploadResponse struct {
 	Message string `json:"message"`
 }
 
+type RagVectorizationRequest struct {
+	FileName []string `json:"fileName"`
+}
+
+type RagVectorizationResponse struct {
+	Ids []string `json:"ids"`
+}
+
 type RegisterRequest struct {
 	Username string `json:"username" validate:"required,min=3,max=20"`
 	Password string `json:"password" validate:"required,min=6,max=20"`
