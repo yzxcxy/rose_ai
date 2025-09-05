@@ -2,20 +2,28 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/cloudwego/eino/components/model"
+	prompt2 "github.com/cloudwego/eino/components/prompt"
 	"github.com/cloudwego/eino/components/tool"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/flow/agent"
 	"github.com/cloudwego/eino/flow/agent/react"
 	"github.com/cloudwego/eino/schema"
+	"github.com/zeromicro/go-zero/core/logx"
+	"rose/internal/agent/custom_retriver"
 	"rose/internal/config"
 	"rose/internal/custom_tools"
+	"rose/internal/types"
+	"strconv"
 )
 
 type Agent struct {
 	ChatModel        model.ToolCallingChatModel
 	ReAct            *react.Agent
 	CallBackForReact []agent.AgentOption
+	ChatTemplate     prompt2.ChatTemplate
+	Retriever        *custom_retriver.VikingDBRetriever
 }
 
 // NewAgent creates a new Agent instance with the provided configuration.
@@ -35,10 +43,7 @@ func NewAgent(conf *config.Config) (agent *Agent, err error) {
 	}
 
 	messageModifier := func(ctx context.Context, input []*schema.Message) []*schema.Message {
-		res := make([]*schema.Message, 0, len(input)+1)
-		res = append(res, schema.SystemMessage(prompt))
-		res = append(res, input...)
-		return res
+		return input
 	}
 
 	ctx := context.Background()
@@ -50,11 +55,57 @@ func NewAgent(conf *config.Config) (agent *Agent, err error) {
 
 	agent.CallBackForReact = getOpts()
 
+	agent.ChatTemplate = NewChatTemplate()
+	agent.Retriever = custom_retriver.GetRetriever(conf)
+
 	return agent, nil
 }
 
 // QA method uses the ReAct agent to generate a response based on the provided messages.
-func (agent *Agent) QA(ctx context.Context, message []*schema.Message) (*schema.Message, error) {
+func (agent *Agent) QA(ctx context.Context, req *types.QaRequest) (*schema.Message, error) {
+	// 根据输入查询文档
+	docs, err := agent.Retriever.Retrieve(ctx, req.Input)
+	if err != nil {
+		return nil, err
+	}
+	// 将文档转化为一个列表信息
+	var resources string
+	for idx, _ := range docs {
+		jsonData, err := json.Marshal(docs[idx])
+		if err != nil {
+			return nil, err
+		}
+		metadata := string(jsonData)
+		resources += "(" + strconv.Itoa(idx+1) + "): " + docs[idx].String() + "metadata: " + metadata + "\n"
+	}
+
+	// 历史消息的mock
+	// TODO： 根据sessionID进行查询具体的历史消息，同时判断first的值
+	var history = []*schema.Message{
+		{
+			Role:    schema.User,
+			Content: "你好",
+		},
+		{
+			Role:    schema.Assistant,
+			Content: "你好，请问我有什么可以帮助到你的吗",
+		},
+	}
+
+	variables := map[string]any{
+		"question":          req.Input,
+		"history":           history,
+		"not_first":         true,
+		"retrieval_results": resources,
+	}
+
+	// 格式化
+	message, err := agent.ChatTemplate.Format(ctx, variables)
+	if err != nil {
+		logx.Error(err)
+		return nil, err
+	}
+
 	generate, err := agent.ReAct.Generate(ctx, message, agent.CallBackForReact...)
 	if err != nil {
 		return nil, err
@@ -71,14 +122,3 @@ func getOpts() []agent.AgentOption {
 
 	return opt
 }
-
-var prompt string = `
-	你是一个高效的TODOs系统智能助手，帮助用户管理TODOs,但是不的功能还不仅仅如此。你的目标是提供清晰、简洁且实用的任务管理支持。以下是你的行为准则和提示词：
-	1.任务管理：
-	1.1 帮助用户创建、查看、编辑、删除和标记任务完成。
-	2. 交互方式：
-	2.1 使用简洁、友好的中文与用户沟通。
-	2.2 主动询问用户是否需要添加新任务、查看任务列表或更新任务状态。
-	2.3 如果用户输入不完整或者不能直接满足调用工具的格式的时候，可以礼貌地请求补充必要信息或者自己补充或者请求其他工具补充完输入信息。
-	2.4 如果询问的不是任务相关内容，按照正常的逻辑回答用户。
-`

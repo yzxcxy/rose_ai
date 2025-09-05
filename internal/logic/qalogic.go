@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"github.com/cloudwego/eino/schema"
 	"rose/internal/svc"
 	"rose/internal/types"
 
@@ -24,11 +23,8 @@ func NewQaLogic(ctx context.Context, svcCtx *svc.ServiceContext) *QaLogic {
 }
 
 func (l *QaLogic) Qa(req *types.QaRequest) (resp *types.QaResponse, err error) {
-	messages := []*schema.Message{
-		schema.UserMessage(req.Input),
-	}
 
-	generate, err := l.svcCtx.Agent.QA(l.ctx, messages)
+	generate, err := l.svcCtx.Agent.QA(l.ctx, req)
 	if err != nil {
 		return nil, err
 	}

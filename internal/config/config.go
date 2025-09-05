@@ -33,5 +33,19 @@ type Config struct {
 	Doubao struct {
 		APIKey string // Doubao API Key
 		Model  string // Doubao 模型名称
+		AK     string
+		SK     string
+	}
+
+	VikingDB struct {
+		Host              string // VikingDB 主机地址
+		Region            string // VikingDB 区域
+		AK                string // VikingDB 访问密钥 AK
+		SK                string // VikingDB 访问密钥 SK
+		Scheme            string // VikingDB 连接协议 (http 或 https)
+		Collection        string // VikingDB 集合名称
+		UseBuiltin        bool   // 是否使用 VikingDB 内置向量化方法
+		ConnectionTimeout int64  // 连接超时时间，单位为秒
+		Chunk             int    // 一次性插入的大小
 	}
 }

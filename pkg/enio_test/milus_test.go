@@ -48,8 +48,8 @@ func TestMilus(t *testing.T) {
 	}(cli)
 
 	embedder, _ := ark.NewEmbedder(ctx, &ark.EmbeddingConfig{
-		APIKey: "",                                   // 使用 API Key 认证
-		Model:  "doubao-embedding-large-text-250515", // Ark 平台的端点 ID
+		APIKey: "",                                  // 使用 API Key 认证
+		Model:  "doubao-embedder-large-text-250515", // Ark 平台的端点 ID
 	})
 
 	fields := []*entity.Field{
@@ -96,7 +96,7 @@ func TestMilus(t *testing.T) {
 			texts = append(texts, doc.Content)
 		}
 
-		// build embedding documents for storing
+		// build embedder documents for storing
 		for idx, vec := range vectors {
 			em[idx].Vector = Float64ToFloat32(vec)
 			rows = append(rows, &em[idx])

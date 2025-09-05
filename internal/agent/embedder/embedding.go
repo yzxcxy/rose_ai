@@ -1,4 +1,4 @@
-package agent
+package embedder
 
 import (
 	"context"
@@ -21,7 +21,8 @@ func GetEmbedder(conf *config.Config) embedding.Embedder {
 func newEmbedderOnce(conf *config.Config) {
 	ctx := context.Background()
 	embedder, _ = ark.NewEmbedder(ctx, &ark.EmbeddingConfig{
-		APIKey: conf.Doubao.APIKey, // 使用 API Key 认证
-		Model:  conf.Doubao.Model,  // Ark 平台的端点 ID
+		Model:     conf.Doubao.Model, // Ark 平台的端点 ID
+		AccessKey: conf.Doubao.AK,
+		SecretKey: conf.Doubao.SK,
 	})
 }
