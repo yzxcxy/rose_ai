@@ -46,13 +46,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/todos",
-				Handler: createTodoHandler(serverCtx),
+				Path:    "/todoList",
+				Handler: listTodosHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodGet,
+				Method:  http.MethodPost,
 				Path:    "/todos",
-				Handler: listTodosHandler(serverCtx),
+				Handler: createTodoHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,

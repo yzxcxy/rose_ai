@@ -89,7 +89,7 @@ func (vr *VikingDBRetriever) Retrieve(ctx context.Context, query string, opts ..
 		return nil, err
 	}
 	// 将结果转换为[]*schema.Document，然后返回,并注意筛选返回分数
-	scoreThreshold := 0.5
+	scoreThreshold := 0.7
 
 	var data []*schema.Document
 	for idx, _ := range res {

@@ -158,7 +158,7 @@ service rose-api {
 
 	// 分页列表
 	@handler listTodos
-	get /todos (ListTodoReq) returns (ListTodoResp)
+	post /todoList (ListTodoReq) returns (ListTodoResp)
 
 	// 更新
 	@handler updateTodo

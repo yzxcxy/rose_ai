@@ -38,6 +38,7 @@ func NewAgent(conf *config.Config) (agent *Agent, err error) {
 	toolsConfig := compose.ToolsNodeConfig{
 		Tools: []tool.BaseTool{
 			custom_tools.NewAddTodoTool("http://localhost:8888"),
+			custom_tools.NewQueryTodosTool("http://localhost:8888"),
 			custom_tools.NewTimeTool(),
 		},
 	}
@@ -68,6 +69,7 @@ func (agent *Agent) QA(ctx context.Context, req *types.QaRequest) (*schema.Messa
 	if err != nil {
 		return nil, err
 	}
+	logx.Infof("召回文档数目为：%d", len(docs))
 	// 将文档转化为一个列表信息
 	var resources string
 	for idx, _ := range docs {
