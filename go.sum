@@ -125,8 +125,6 @@ github.com/cloudwego/eino-ext/components/indexer/milvus v0.0.0-20250903035842-96
 github.com/cloudwego/eino-ext/components/indexer/milvus v0.0.0-20250903035842-96774a3ec845/go.mod h1:Hdm2ql0T4+QcZoOVmgH9xovEJaTiQowKq3bc+lAXr50=
 github.com/cloudwego/eino-ext/components/model/deepseek v0.0.0-20250903035842-96774a3ec845 h1:ZXMVGg/78UAKO2f6H5mB2gY9YFjbekxHkva4qAfNdRM=
 github.com/cloudwego/eino-ext/components/model/deepseek v0.0.0-20250903035842-96774a3ec845/go.mod h1:O6leaZBwE5s1wSsf5idW52Yaj1zWzhtjinSnfPXASNU=
-github.com/cloudwego/eino-ext/components/retriever/milvus v0.0.0-20250903035842-96774a3ec845 h1:8SCiv/QK3xSLqa+VEe5p+QekrQv/UjbhwQasJ1uI8Mg=
-github.com/cloudwego/eino-ext/components/retriever/milvus v0.0.0-20250903035842-96774a3ec845/go.mod h1:PYh8yoOcuFYVfSZZ4vglaeRgaXrMz5D4uKioDZxEDA0=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/cncf/xds/go v0.0.0-20210312221358-fbca930ec8ed/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=

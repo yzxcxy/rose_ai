@@ -23,15 +23,14 @@ func NewQaLogic(ctx context.Context, svcCtx *svc.ServiceContext) *QaLogic {
 }
 
 func (l *QaLogic) Qa(req *types.QaRequest) (resp *types.QaResponse, err error) {
-
-	generate, err := l.svcCtx.Agent.QA(l.ctx, req)
+	ctx := context.WithValue(l.ctx, "redis", l.svcCtx.Redis)
+	generate, err := l.svcCtx.Agent.QA(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	resp = &types.QaResponse{
 		SessionID: req.SessionID,
 		Output:    generate.Content,
-		Memory:    req.Memory,
 	}
 	return
 }

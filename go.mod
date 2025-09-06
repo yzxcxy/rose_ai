@@ -12,7 +12,6 @@ require (
 	github.com/cloudwego/eino-ext/components/embedding/ark v0.1.0
 	github.com/cloudwego/eino-ext/components/indexer/milvus v0.0.0-20250903035842-96774a3ec845
 	github.com/cloudwego/eino-ext/components/model/deepseek v0.0.0-20250903035842-96774a3ec845
-	github.com/cloudwego/eino-ext/components/retriever/milvus v0.0.0-20250903035842-96774a3ec845
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.2

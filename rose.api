@@ -37,7 +37,6 @@ type RagUploadResponse {
 type QaRequest {
 	SessionID string `json:"session_id"`
 	Input     string `json:"input"`
-	Memory    Memory `json:"memory"`
 }
 
 type Memory {
@@ -53,7 +52,6 @@ type Message {
 type QaResponse {
 	SessionID string `json:"session_id"`
 	Output    string `json:"output"`
-	Memory    Memory `json:"memory"`
 }
 
 type Todo {
@@ -127,6 +125,51 @@ type RagVectorizationResponse {
 	ids []string `json:"ids"`
 }
 
+type ChatCreateRequest {
+	title string `json:"title"`
+}
+
+type ChatCreateResponse {
+	sessionId string `json:"sessionId"`
+}
+
+type ChatDeleteRequest {
+	sessionId string `path:"sessionId"`
+}
+
+type ChatDeleteResponse {}
+
+type ChatUpdateRequest {
+	sessionId string `path:"sessionId"`
+	title     string `json:"title"`
+}
+
+type ChatUpdateResponse {}
+
+type ChatQueryRequest {
+	sessionId string `path:"sessionId"`
+}
+
+type ChatQueryReponse {
+	sessionId string    `josn:"sessionId"`
+	title     string    `json:"title"`
+	History   []Message `json:"history"`
+}
+
+type ChatQueryUserListRequest {
+	userId int64 `json:"userId"`
+}
+
+type ChatSession {
+	sessionId string `josn:"sessionId"`
+	title     string `json:"title"`
+}
+
+type ChatQueryUserListResponse {
+	userId   int64         `json:"userId"`
+	chatList []ChatSession `json:"list"`
+}
+
 service rose-api {
 	@handler loginHandler
 	post /login (LoginRequest) returns (LoginResponse)
@@ -167,5 +210,24 @@ service rose-api {
 	// 删除
 	@handler deleteTodo
 	delete /todos/:todoId (DeleteTodoReq)
+
+	// 创建聊天会话
+	@handler createChat
+	post /chat (ChatCreateRequest) returns (ChatCreateResponse)
+
+	// 删除聊天会话
+	@handler deleteChat
+	delete /chat/:sessionId (ChatDeleteRequest) returns (ChatDeleteResponse)
+
+	// 更新聊天会话
+	@handler updateChat
+	put /chat/:sessionId (ChatUpdateRequest) returns (ChatUpdateResponse)
+
+	// 查询某个聊天
+	@handler queryChat
+	get /chat/:sessionId (ChatQueryRequest) returns (ChatQueryReponse)
+
+	@handler queryChatList
+	get /chat/userChatList (ChatQueryUserListRequest) returns (ChatQueryUserListResponse)
 }
 

@@ -3,6 +3,53 @@
 
 package types
 
+type ChatCreateRequest struct {
+	Title string `json:"title"`
+}
+
+type ChatCreateResponse struct {
+	SessionId string `json:"sessionId"`
+}
+
+type ChatDeleteRequest struct {
+	SessionId string `path:"sessionId"`
+}
+
+type ChatDeleteResponse struct {
+}
+
+type ChatQueryReponse struct {
+	SessionId string    `josn:"sessionId"`
+	Title     string    `json:"title"`
+	History   []Message `json:"history"`
+}
+
+type ChatQueryRequest struct {
+	SessionId string `path:"sessionId"`
+}
+
+type ChatQueryUserListRequest struct {
+	UserId int64 `json:"userId"`
+}
+
+type ChatQueryUserListResponse struct {
+	UserId   int64         `json:"userId"`
+	ChatList []ChatSession `json:"list"`
+}
+
+type ChatSession struct {
+	SessionId string `josn:"sessionId"`
+	Title     string `json:"title"`
+}
+
+type ChatUpdateRequest struct {
+	SessionId string `path:"sessionId"`
+	Title     string `json:"title"`
+}
+
+type ChatUpdateResponse struct {
+}
+
 type CreateTodoReq struct {
 	Name        string `json:"name" validate:"required" validate:"min=3,max=100"`
 	Description string `json:"description" validate:"omitempty,max=500"`
@@ -64,13 +111,11 @@ type Message struct {
 type QaRequest struct {
 	SessionID string `json:"session_id"`
 	Input     string `json:"input"`
-	Memory    Memory `json:"memory"`
 }
 
 type QaResponse struct {
 	SessionID string `json:"session_id"`
 	Output    string `json:"output"`
-	Memory    Memory `json:"memory"`
 }
 
 type RagUploadRequest struct {

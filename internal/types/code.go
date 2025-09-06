@@ -15,6 +15,7 @@ const (
 	ErrorInvalidDateFormat
 	ErrorNoPermission
 	ErrorFileNotExist
+	ErrorChatNotFound
 )
 
 var errorMessage = map[int]string{
@@ -30,6 +31,7 @@ var errorMessage = map[int]string{
 	ErrorInvalidDateFormat:      "Invalid date format, expected '2006-01-02 15:04:05'",
 	ErrorNoPermission:           "No permission to access this resource",
 	ErrorFileNotExist:           "file not found",
+	ErrorChatNotFound:           "Chat not found",
 }
 
 // GetError returns the error message for a given error code.
