@@ -27,5 +27,6 @@ func NewUserModel(conn sqlx.SqlConn) UserModel {
 }
 
 func (m *customUserModel) withSession(session sqlx.Session) UserModel {
-	return NewUserModel(sqlx.NewSqlConnFromSession(session))
+	//return NewUserModel(sqlx.NewSqlConnFromSession(session))
+	return &customUserModel{}
 }

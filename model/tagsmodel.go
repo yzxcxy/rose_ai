@@ -25,5 +25,6 @@ func NewTagsModel(conn sqlx.SqlConn) TagsModel {
 }
 
 func (m *customTagsModel) withSession(session sqlx.Session) TagsModel {
-	return NewTagsModel(sqlx.NewSqlConnFromSession(session))
+	//return NewTagsModel(sqlx.NewSqlConnFromSession(session))
+	return &customTagsModel{}
 }

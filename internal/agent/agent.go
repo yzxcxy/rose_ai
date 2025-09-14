@@ -26,7 +26,7 @@ type Agent struct {
 	ReAct            *react.Agent
 	CallBackForReact []agent.AgentOption
 	ChatTemplate     prompt2.ChatTemplate
-	Retriever        *custom_retriver.VikingDBRetriever
+	Retriever        *custom_retriver.MilvusRetriever
 }
 
 // NewAgent creates a new Agent instance with the provided configuration.
@@ -60,7 +60,11 @@ func NewAgent(conf *config.Config) (agent *Agent, err error) {
 	agent.CallBackForReact = getOpts()
 
 	agent.ChatTemplate = NewChatTemplate()
-	agent.Retriever = custom_retriver.GetRetriever(conf)
+	retriever, err := custom_retriver.NewMilvusRetriever(conf)
+	if err != nil {
+		return nil, err
+	}
+	agent.Retriever = retriever
 
 	return agent, nil
 }

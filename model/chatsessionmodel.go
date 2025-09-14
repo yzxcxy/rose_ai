@@ -33,7 +33,8 @@ func NewChatSessionModel(conn sqlx.SqlConn) ChatSessionModel {
 }
 
 func (m *customChatSessionModel) withSession(session sqlx.Session) ChatSessionModel {
-	return NewChatSessionModel(sqlx.NewSqlConnFromSession(session))
+	//return NewChatSessionModel(sqlx.NewSqlConnFromSession(session))
+	return &customChatSessionModel{}
 }
 
 func (m *defaultChatSessionModel) FindChatSessionByUserId(ctx context.Context, userId int64) ([]*ChatSession, error) {

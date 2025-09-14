@@ -16,14 +16,19 @@ import (
 type StoreFileToVector struct {
 	Splitter document.Transformer
 	// Indexer 隐含了Embedder
-	VectorStore *indexer.VectorStoreForVikingDB
+	VectorStore *indexer.MilvusIndexer
 	Loader      *document_loader.DocumentLoader
 }
 
 func NewStoreFileToVector(conf *config.Config) *StoreFileToVector {
+	milvusIndexer, err := indexer.NewMilvusIndexer(conf)
+	if err != nil {
+		logx.Errorf("NewMilvusIndexer err: %v", err)
+		return nil
+	}
 	return &StoreFileToVector{
 		Splitter:    custom_splitter.GetSplitter(embedder.GetEmbedder(conf), conf),
-		VectorStore: indexer.NewVectorStoreForVikingDB(conf),
+		VectorStore: milvusIndexer,
 		Loader:      document_loader.GetDocumentLoader(conf),
 	}
 }

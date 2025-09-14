@@ -38,7 +38,9 @@ func NewTodosModel(conn sqlx.SqlConn) TodosModel {
 }
 
 func (m *customTodosModel) withSession(session sqlx.Session) TodosModel {
-	return NewTodosModel(sqlx.NewSqlConnFromSession(session))
+	//return NewTodosModel(sqlx.NewSqlConnFromSession(session))
+	//为了解决版本依赖问题，临时使用下面的方式
+	return &customTodosModel{}
 }
 
 func (m *customTodosModel) ListToDos(ctx context.Context, list ListToDos) ([]*Todos, error) {

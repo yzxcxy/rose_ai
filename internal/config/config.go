@@ -48,4 +48,9 @@ type Config struct {
 		ConnectionTimeout int64  // 连接超时时间，单位为秒
 		Chunk             int    // 一次性插入的大小
 	}
+
+	Milvus struct {
+		Host   string // Milvus 主机地址
+		DBName string // Milvus 数据库名称
+	}
 }
