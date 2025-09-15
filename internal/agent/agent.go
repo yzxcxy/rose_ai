@@ -158,7 +158,12 @@ func (agent *Agent) QA(ctx context.Context, req *types.QaRequest) (*schema.Messa
 	}
 
 	// 将聊天记录添加到redis中
-	messageJson, err := json.Marshal(message[len(message)-1])
+	// 为了规则redis，只将他们的对话保存，不存储ChatTemplate生成的消息
+	userMessage := schema.Message{
+		Role:    schema.User,
+		Content: req.Input,
+	}
+	messageJson, err := json.Marshal(userMessage)
 	redisClient.RPush(ctx, historyKey, string(messageJson))
 
 	jsonData, err := json.Marshal(generate)
@@ -182,6 +187,7 @@ func getOpts() []agent.AgentOption {
 // 通过协程进行调用，判断是否对消息进行压缩
 func (agent *Agent) summaryMessages(ctx context.Context, rdb *redis.Client, user string, sessionId string, length int, summaryIndex int) {
 	// 原则：保留前三条且字符数大于1K才进行总结
+	// TODO: 后续可以将总结的缓存消息字数也保存下来，假如策略选择当中
 	currIndex := length - 1
 	if currIndex < 3 || currIndex-summaryIndex+1 <= 3 {
 		return
@@ -202,9 +208,20 @@ func (agent *Agent) summaryMessages(ctx context.Context, rdb *redis.Client, user
 
 	// 启动总结
 	if count > 1024 {
+		// 取新的数据
+		vals, err = rdb.LRange(ctx, historyKey, 0, int64(summaryEnd)).Result()
+		if err != nil {
+			logx.Error(err)
+			return
+		}
 		summaryIndexKey := user + "::" + "summary_index::" + sessionId
 		summaryKey := user + "::summary::" + sessionId
 		var message []*schema.Message
+		// 添加需要总结的提示词
+		message = append(message, &schema.Message{
+			Role:    schema.User,
+			Content: "总结下面的消息",
+		})
 		for idx, _ := range vals {
 			var val schema.Message
 			err := json.Unmarshal([]byte(vals[idx]), &val)
