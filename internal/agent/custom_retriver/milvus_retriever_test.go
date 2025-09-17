@@ -24,7 +24,7 @@ func TestMilvusRetriever(t *testing.T) {
 		return
 	}
 
-	documents, err := r.Retrieve(context.Background(), "解释golang中的range关键字")
+	documents, err := r.Retrieve(context.Background(), "解释一下golang的sync包")
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -32,6 +32,6 @@ func TestMilvusRetriever(t *testing.T) {
 
 	t.Logf("retrieved %d documents \n", len(documents))
 	for _, doc := range documents {
-		t.Logf("id: %v, content: %v, metadata: %v \n", doc.ID, doc.Content, doc.MetaData)
+		t.Logf("id: %v, \n", doc.ID)
 	}
 }

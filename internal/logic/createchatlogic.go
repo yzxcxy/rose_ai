@@ -39,7 +39,7 @@ func (l *CreateChatLogic) CreateChat(req *types.ChatCreateRequest) (resp *types.
 	if err != nil {
 		return nil, err
 	}
-	summaryIndexKey := strconv.FormatInt(uid, 10) + "::" + "summary_index::" + strconv.FormatInt(sessionId, 10)
+	summaryIndexKey := strconv.FormatInt(uid, 10) + ":" + "summary_index:" + strconv.FormatInt(sessionId, 10)
 	// 将summaryIndex预先定义为-1
 	l.svcCtx.Redis.Set(l.ctx, summaryIndexKey, -1, 0)
 	return &types.ChatCreateResponse{

@@ -8,6 +8,7 @@ import (
 	"github.com/cloudwego/eino/components/retriever"
 	"github.com/cloudwego/eino/schema"
 	"github.com/milvus-io/milvus/client/v2/entity"
+	"github.com/milvus-io/milvus/client/v2/index"
 	"github.com/milvus-io/milvus/client/v2/milvusclient"
 	"github.com/zeromicro/go-zero/core/logx"
 	"rose/internal/agent/embedder"
@@ -47,11 +48,11 @@ func NewMilvusRetriever(conf *config.Config) (*MilvusRetriever, error) {
 
 func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ...retriever.Option) ([]*schema.Document, error) {
 	// TODO: 暂时采用ANN搜索
-	collectionName, err := getCollectionName(ctx)
-	if err != nil {
-		return nil, err
-	}
-	//collectionName := "user_77674160750333952"
+	//collectionName, err := getCollectionName(ctx)
+	//if err != nil {
+	//	return nil, err
+	//}
+	collectionName := "user_77674160750333952"
 	vectors, err := this.EmbModel.EmbedStrings(ctx, []string{query})
 	if err != nil {
 		return nil, err
@@ -62,12 +63,25 @@ func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ..
 	}
 
 	var queryVector = make([]float32, len(vectors[0]))
+	// 将[]float64转为[]float32
+	for i := range vectors[0] {
+		queryVector[i] = float32(vectors[0][i])
+	}
+
+	// 构建范围搜索参数
+	annParam := index.NewCustomAnnParam()
+	annParam.WithRadius(0.7)
+	annParam.WithRangeFilter(1)
+
 	resultSets, err := this.Client.Search(ctx, milvusclient.NewSearchOption(
 		collectionName,
 		10,
 		[]entity.Vector{entity.FloatVector(queryVector)}).
 		WithOutputFields([]string{"id", "content", "meta_data"}...).
-		WithConsistencyLevel(entity.ClStrong))
+		WithConsistencyLevel(entity.ClStrong).
+		WithANNSField("vector").
+		WithAnnParam(annParam),
+	)
 
 	if err != nil {
 		return nil, err
@@ -77,9 +91,13 @@ func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ..
 	var docs []*schema.Document
 	// 不能直接range
 	for i := range resultSets {
+		if resultSets[i].ResultCount == 0 {
+			continue
+		}
 		idScalars := resultSets[i].IDs.FieldData().GetScalars().GetStringData().GetData()
 		contentScalars := resultSets[i].GetColumn("content").FieldData().GetScalars().GetStringData().GetData()
 		metaDataScalars := resultSets[i].GetColumn("meta_data").FieldData().GetScalars().GetJsonData().GetData()
+		scoreScalars := resultSets[i].Scores
 		for idx := 0; idx < resultSets[i].ResultCount; idx++ {
 			var doc = &schema.Document{}
 			doc.ID = idScalars[idx]
@@ -89,6 +107,8 @@ func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ..
 				return nil, err
 			}
 			docs = append(docs, doc)
+			// 出现召回分数为0的情况。
+			logx.Infof("召回分数为: %f", scoreScalars[idx])
 		}
 	}
 

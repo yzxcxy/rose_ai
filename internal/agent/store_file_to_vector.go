@@ -58,6 +58,13 @@ func (s *StoreFileToVector) Store(ctx context.Context, fileName []string, user s
 	}
 
 	for i, _ := range splitterRes {
+		// TODO 这是为了解决 splitter 出现空内容的bug，后续需要排查原因
+		if !isValid(splitterRes[i].Content) {
+			// 不需要关心顺序，直接用最后一个元素覆盖
+			splitterRes[i] = splitterRes[len(splitterRes)-1]
+			splitterRes = splitterRes[:len(splitterRes)-1]
+			continue
+		}
 		u := uuid.New()
 		splitterRes[i].ID = u.String()
 	}
@@ -69,4 +76,17 @@ func (s *StoreFileToVector) Store(ctx context.Context, fileName []string, user s
 	}
 	logx.Infof("StoreFileToVector Store success, count: %d", len(ids))
 	return ids, nil
+}
+
+func isValid(str string) bool {
+	checks := map[string]interface{}{
+		"":   nil,
+		" ":  nil,
+		"\n": nil,
+	}
+
+	if _, exists := checks[str]; exists {
+		return false
+	}
+	return true
 }

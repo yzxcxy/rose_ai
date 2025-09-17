@@ -77,25 +77,29 @@ func (agent *Agent) QA(ctx context.Context, req *types.QaRequest) (*schema.Messa
 	uid, _, _ := utils.GetUserIdAndUserNameFromContext(ctx)
 	uidStr := strconv.FormatInt(uid, 10)
 	// 先判断有没有历史聊天消息
-	historyKey := uidStr + "::" + req.SessionID
+	historyKey := uidStr + ":" + req.SessionID
 	// LLen函数中key不存在会返回长度为0
 	length, err := redisClient.LLen(ctx, historyKey).Result()
 	var summaryIndex int
 	if err == nil && length > 0 {
 		// 如果有历史聊天消息的时候才去获取聊天记录
 		var start = 0
-		summaryIndexKey := uidStr + "::" + "summary_index::" + req.SessionID
+		summaryIndexKey := uidStr + ":" + "summary_index:" + req.SessionID
 		res, err := redisClient.Get(ctx, summaryIndexKey).Result()
 		if err != nil {
 			if !errors.Is(redis.Nil, err) {
+				logx.Error(err)
 				return nil, err
 			}
+			logx.Error(err)
+			summaryIndex = -1
+		} else {
+			summaryIndex, _ = strconv.Atoi(res)
 		}
-		summaryIndex, _ = strconv.Atoi(res)
 		start = summaryIndex + 1
 		// 获得summary数据
 		if summaryIndex > -1 {
-			summaryKey := uidStr + "::summary::" + req.SessionID
+			summaryKey := uidStr + ":summary:" + req.SessionID
 			summary, err := redisClient.Get(ctx, summaryKey).Result()
 			if err != nil {
 				return nil, err
@@ -194,7 +198,7 @@ func (agent *Agent) summaryMessages(ctx context.Context, rdb *redis.Client, user
 	}
 
 	summaryEnd := currIndex - 3
-	historyKey := user + "::" + sessionId
+	historyKey := user + ":" + sessionId
 	vals, err := rdb.LRange(ctx, historyKey, int64(summaryIndex+1), int64(summaryEnd)).Result()
 	if err != nil {
 		logx.Error(err)
@@ -214,8 +218,8 @@ func (agent *Agent) summaryMessages(ctx context.Context, rdb *redis.Client, user
 			logx.Error(err)
 			return
 		}
-		summaryIndexKey := user + "::" + "summary_index::" + sessionId
-		summaryKey := user + "::summary::" + sessionId
+		summaryIndexKey := user + ":" + "summary_index:" + sessionId
+		summaryKey := user + ":summary:" + sessionId
 		var message []*schema.Message
 		// 添加需要总结的提示词
 		message = append(message, &schema.Message{

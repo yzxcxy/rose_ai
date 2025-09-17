@@ -44,7 +44,7 @@ func (l *QueryChatLogic) QueryChat(req *types.ChatQueryRequest) (resp *types.Cha
 	}
 
 	// 查询redis
-	historyKey := uidStr + "::" + req.SessionId
+	historyKey := uidStr + ":" + req.SessionId
 	n, err := l.svcCtx.Redis.Exists(l.ctx, historyKey).Result()
 	if err != nil || n == 0 {
 		return &types.ChatQueryReponse{
