@@ -70,6 +70,7 @@ func (this *MilvusIndexer) Store(ctx context.Context, docs []*schema.Document, o
 	var vectorsCol [][]float32
 	var contentsCol []string
 	var metaDataCol [][]byte
+	var fileNameCol []string
 
 	for i := range docs {
 		idsCol = append(idsCol, docs[i].ID)
@@ -91,12 +92,22 @@ func (this *MilvusIndexer) Store(ctx context.Context, docs []*schema.Document, o
 		metaDataCol = append(metaDataCol, jsonData)
 	}
 
+	// 提取文件名
+	for i := range docs {
+		if name, ok := docs[i].MetaData["_file_name"]; ok {
+			fileNameCol = append(fileNameCol, name.(string))
+		} else {
+			fileNameCol = append(fileNameCol, "unknown")
+		}
+	}
+
 	// 插入数据
 	insertResult, err := this.Client.Insert(ctx, milvusclient.NewColumnBasedInsertOption(collectionName).
 		WithVarcharColumn("id", idsCol).
 		WithFloatVectorColumn("vector", 2048, vectorsCol).
 		WithVarcharColumn("content", contentsCol).
-		WithColumns(column.NewColumnJSONBytes("meta_data", metaDataCol)))
+		WithColumns(column.NewColumnJSONBytes("meta_data", metaDataCol)).
+		WithVarcharColumn("file_name", fileNameCol))
 
 	if err != nil {
 		return nil, err
@@ -112,16 +123,39 @@ func (this *MilvusIndexer) CreateCollectionAndIndex(ctx context.Context, collect
 		WithField(entity.NewField().WithName("id").WithIsAutoID(false).WithDataType(entity.FieldTypeVarChar).WithIsPrimaryKey(true).WithMaxLength(258)).
 		WithField(entity.NewField().WithName("vector").WithDataType(entity.FieldTypeFloatVector).WithDim(2048)).
 		WithField(entity.NewField().WithName("content").WithDataType(entity.FieldTypeVarChar).WithMaxLength(1024)).
-		WithField(entity.NewField().WithName("meta_data").WithDataType(entity.FieldTypeJSON).WithMaxLength(1024))
+		WithField(entity.NewField().WithName("meta_data").WithDataType(entity.FieldTypeJSON).WithMaxLength(1024)).
+		WithField(entity.NewField().WithName("file_name").WithDataType(entity.FieldTypeVarChar).WithMaxLength(1024).WithEnableAnalyzer(true)).
+		WithField(entity.NewField().WithName("sparse").WithDataType(entity.FieldTypeSparseVector))
+
+	// 将文本转换为稀疏向量
+	function := entity.NewFunction().
+		WithName("text_bm25_emb").
+		WithInputFields("file_name").
+		WithOutputFields("sparse").
+		WithType(entity.FunctionTypeBM25)
+	schema.WithFunction(function)
 
 	err = this.Client.CreateCollection(ctx, milvusclient.NewCreateCollectionOption(collectionName, schema))
 	if err != nil {
 		return err
 	}
 
-	// 创建索引
+	// 创建索引（稠密向量的索引）
 	hnswIndex := index.NewHNSWIndex(entity.COSINE, 16, 200)
 	loadTask, err := this.Client.CreateIndex(ctx, milvusclient.NewCreateIndexOption(collectionName, "vector", hnswIndex))
+	if err != nil {
+		return err
+	}
+
+	// 创建稀疏向量的索引
+	indexOption := milvusclient.NewCreateIndexOption(collectionName, "sparse",
+		index.NewSparseInvertedIndex(entity.BM25, 0.2))
+
+	indexOption.WithExtraParam("inverted_index_algo", "DAAT_MAXSCORE")
+	indexOption.WithExtraParam("bm25_k1", 1.2)
+	indexOption.WithExtraParam("bm25_b", 0.75)
+
+	loadTask2, err := this.Client.CreateIndex(ctx, indexOption)
 	if err != nil {
 		return err
 	}
@@ -131,6 +165,11 @@ func (this *MilvusIndexer) CreateCollectionAndIndex(ctx context.Context, collect
 
 	// sync wait collection to be loaded
 	err = loadTask.Await(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = loadTask2.Await(ctx)
 	if err != nil {
 		return err
 	}

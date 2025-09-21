@@ -8,7 +8,6 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"rose/internal/agent/custom_splitter"
 	"rose/internal/agent/document_loader"
-	"rose/internal/agent/embedder"
 	"rose/internal/agent/indexer"
 	"rose/internal/config"
 )
@@ -27,7 +26,7 @@ func NewStoreFileToVector(conf *config.Config) *StoreFileToVector {
 		return nil
 	}
 	return &StoreFileToVector{
-		Splitter:    custom_splitter.GetSplitter(embedder.GetEmbedder(conf), conf),
+		Splitter:    custom_splitter.NewSplitterProxy(conf),
 		VectorStore: milvusIndexer,
 		Loader:      document_loader.GetDocumentLoader(conf),
 	}
@@ -57,7 +56,7 @@ func (s *StoreFileToVector) Store(ctx context.Context, fileName []string, user s
 		return nil, err
 	}
 
-	for i, _ := range splitterRes {
+	for i := 0; i < len(splitterRes); i++ {
 		// TODO 这是为了解决 splitter 出现空内容的bug，后续需要排查原因
 		if !isValid(splitterRes[i].Content) {
 			// 不需要关心顺序，直接用最后一个元素覆盖

@@ -36,6 +36,8 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cilium/ebpf v0.11.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
+	github.com/cloudwego/eino-ext/components/document/transformer/splitter/html v0.0.0-20250919093114-b7a34962a8d8 // indirect
+	github.com/cloudwego/eino-ext/components/document/transformer/splitter/markdown v0.0.0-20250919093114-b7a34962a8d8 // indirect
 	github.com/cockroachdb/errors v1.12.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506 // indirect
 	github.com/cockroachdb/redact v1.1.6 // indirect

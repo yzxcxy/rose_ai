@@ -47,12 +47,11 @@ func NewMilvusRetriever(conf *config.Config) (*MilvusRetriever, error) {
 }
 
 func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ...retriever.Option) ([]*schema.Document, error) {
-	// TODO: 暂时采用ANN搜索
-	//collectionName, err := getCollectionName(ctx)
-	//if err != nil {
-	//	return nil, err
-	//}
-	collectionName := "user_77674160750333952"
+	collectionName, err := getCollectionName(ctx)
+	if err != nil {
+		return nil, err
+	}
+	//collectionName := "user_77674160750333952"
 	vectors, err := this.EmbModel.EmbedStrings(ctx, []string{query})
 	if err != nil {
 		return nil, err
@@ -68,20 +67,38 @@ func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ..
 		queryVector[i] = float32(vectors[0][i])
 	}
 
-	// 构建范围搜索参数
 	annParam := index.NewCustomAnnParam()
 	annParam.WithRadius(0.7)
 	annParam.WithRangeFilter(1)
+	// 以下是新增内容
+	annRequest1 := milvusclient.NewAnnRequest("vector", 12, entity.FloatVector(queryVector)).
+		WithAnnParam(annParam)
 
-	resultSets, err := this.Client.Search(ctx, milvusclient.NewSearchOption(
-		collectionName,
-		10,
-		[]entity.Vector{entity.FloatVector(queryVector)}).
-		WithOutputFields([]string{"id", "content", "meta_data"}...).
-		WithConsistencyLevel(entity.ClStrong).
-		WithANNSField("vector").
-		WithAnnParam(annParam),
-	)
+	annParam2 := index.NewSparseAnnParam()
+	annParam2.WithDropRatio(0.2)
+	// entity.Text(query)实现了entity.Vector接口
+	annRequest2 := milvusclient.NewAnnRequest("sparse", 12, entity.Text(query)).
+		WithAnnParam(annParam2)
+
+	//reranker := milvusclient.NewRRFReranker().WithK(100)
+	reranker := milvusclient.NewWeightedReranker([]float64{0.8, 0.2})
+	hybridOpt := milvusclient.NewHybridSearchOption(collectionName, 12,
+		annRequest1,
+		annRequest2).
+		WithReranker(reranker).
+		WithOutputFields([]string{"id", "content", "meta_data"}...)
+
+	resultSets, err := this.Client.HybridSearch(ctx, hybridOpt)
+
+	//resultSets, err := this.Client.Search(ctx, milvusclient.NewSearchOption(
+	//	collectionName,
+	//	10,
+	//	[]entity.Vector{entity.FloatVector(queryVector)}).
+	//	WithOutputFields([]string{"id", "content", "meta_data"}...).
+	//	WithConsistencyLevel(entity.ClStrong).
+	//	WithANNSField("vector").
+	//	WithAnnParam(annParam),
+	//)
 
 	if err != nil {
 		return nil, err

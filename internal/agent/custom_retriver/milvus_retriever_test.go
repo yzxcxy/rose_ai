@@ -24,7 +24,7 @@ func TestMilvusRetriever(t *testing.T) {
 		return
 	}
 
-	documents, err := r.Retrieve(context.Background(), "解释一下golang的sync包")
+	documents, err := r.Retrieve(context.Background(), "解释一下golang的reflect包")
 	if err != nil {
 		t.Fatal(err)
 		return

@@ -12,7 +12,7 @@ import (
 var splitter document.Transformer
 var onceForSplitter sync.Once
 
-func GetSplitter(embedder embedding.Embedder, conf *config.Config) document.Transformer {
+func GetSemanticSplitter(embedder embedding.Embedder, conf *config.Config) document.Transformer {
 	onceForSplitter.Do(func() {
 		newSplitterOnce(embedder, conf)
 	})
@@ -24,7 +24,7 @@ func newSplitterOnce(embedder embedding.Embedder, conf *config.Config) {
 	splitter, _ = semantic.NewSplitter(ctx, &semantic.Config{
 		Embedding:    embedder,                     // 必需：用于生成文本向量的嵌入器
 		BufferSize:   2,                            // 可选：上下文缓冲区大小
-		MinChunkSize: 50,                           // 可选：最小片段大小
+		MinChunkSize: 80,                           // 可选：最小片段大小
 		Separators:   []string{"。", ".", "?", "!"}, // 可选：分隔符列表
 		Percentile:   0.6,                          // 可选：分割阈值百分位数
 		LenFunc:      nil,                          // 可选：自定义长度计算函数
