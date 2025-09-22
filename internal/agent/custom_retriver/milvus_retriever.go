@@ -47,11 +47,11 @@ func NewMilvusRetriever(conf *config.Config) (*MilvusRetriever, error) {
 }
 
 func (this *MilvusRetriever) Retrieve(ctx context.Context, query string, opts ...retriever.Option) ([]*schema.Document, error) {
-	collectionName, err := getCollectionName(ctx)
-	if err != nil {
-		return nil, err
-	}
-	//collectionName := "user_77674160750333952"
+	//collectionName, err := getCollectionName(ctx)
+	//if err != nil {
+	//	return nil, err
+	//}
+	collectionName := "user_77674160750333952"
 	vectors, err := this.EmbModel.EmbedStrings(ctx, []string{query})
 	if err != nil {
 		return nil, err

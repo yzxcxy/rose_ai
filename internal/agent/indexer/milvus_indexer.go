@@ -70,7 +70,6 @@ func (this *MilvusIndexer) Store(ctx context.Context, docs []*schema.Document, o
 	var vectorsCol [][]float32
 	var contentsCol []string
 	var metaDataCol [][]byte
-	var fileNameCol []string
 
 	for i := range docs {
 		idsCol = append(idsCol, docs[i].ID)
@@ -92,22 +91,12 @@ func (this *MilvusIndexer) Store(ctx context.Context, docs []*schema.Document, o
 		metaDataCol = append(metaDataCol, jsonData)
 	}
 
-	// 提取文件名
-	for i := range docs {
-		if name, ok := docs[i].MetaData["_file_name"]; ok {
-			fileNameCol = append(fileNameCol, name.(string))
-		} else {
-			fileNameCol = append(fileNameCol, "unknown")
-		}
-	}
-
 	// 插入数据
 	insertResult, err := this.Client.Insert(ctx, milvusclient.NewColumnBasedInsertOption(collectionName).
 		WithVarcharColumn("id", idsCol).
 		WithFloatVectorColumn("vector", 2048, vectorsCol).
 		WithVarcharColumn("content", contentsCol).
-		WithColumns(column.NewColumnJSONBytes("meta_data", metaDataCol)).
-		WithVarcharColumn("file_name", fileNameCol))
+		WithColumns(column.NewColumnJSONBytes("meta_data", metaDataCol)))
 
 	if err != nil {
 		return nil, err
@@ -122,15 +111,14 @@ func (this *MilvusIndexer) CreateCollectionAndIndex(ctx context.Context, collect
 	schema := entity.NewSchema().WithDynamicFieldEnabled(false).
 		WithField(entity.NewField().WithName("id").WithIsAutoID(false).WithDataType(entity.FieldTypeVarChar).WithIsPrimaryKey(true).WithMaxLength(258)).
 		WithField(entity.NewField().WithName("vector").WithDataType(entity.FieldTypeFloatVector).WithDim(2048)).
-		WithField(entity.NewField().WithName("content").WithDataType(entity.FieldTypeVarChar).WithMaxLength(1024)).
+		WithField(entity.NewField().WithName("content").WithDataType(entity.FieldTypeVarChar).WithMaxLength(1024).WithEnableAnalyzer(true)).
 		WithField(entity.NewField().WithName("meta_data").WithDataType(entity.FieldTypeJSON).WithMaxLength(1024)).
-		WithField(entity.NewField().WithName("file_name").WithDataType(entity.FieldTypeVarChar).WithMaxLength(1024).WithEnableAnalyzer(true)).
 		WithField(entity.NewField().WithName("sparse").WithDataType(entity.FieldTypeSparseVector))
 
 	// 将文本转换为稀疏向量
 	function := entity.NewFunction().
 		WithName("text_bm25_emb").
-		WithInputFields("file_name").
+		WithInputFields("content").
 		WithOutputFields("sparse").
 		WithType(entity.FunctionTypeBM25)
 	schema.WithFunction(function)

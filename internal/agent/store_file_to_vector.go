@@ -66,6 +66,10 @@ func (s *StoreFileToVector) Store(ctx context.Context, fileName []string, user s
 		}
 		u := uuid.New()
 		splitterRes[i].ID = u.String()
+		// 将文件名放到 content field
+		if fileFiled, ok := splitterRes[i].MetaData["_file_name"]; ok {
+			splitterRes[i].Content = fileFiled.(string) + ":\n" + splitterRes[i].Content
+		}
 	}
 	// 3. 存储向量到向量数据库
 	ids, err = s.VectorStore.Store(ctx, splitterRes)
